@@ -1,0 +1,16 @@
+{application, erllambda_sam_example,
+ [{description, "erllambda function - erllambda_sam_example"},
+  {vsn, "git"},
+  {registered, []},
+  {applications,
+   [kernel,
+    stdlib,
+    erllambda,
+    erlcloud,
+    jsx]},
+  {env,[]},
+  {modules, []},
+  {contributors, []},
+  {licenses, []},
+  {links, []}
+ ]}.

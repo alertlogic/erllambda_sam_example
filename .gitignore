@@ -1,0 +1,33 @@
+# emacs save files
+*~
+\#*\#
+
+# Object files
+*.o
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.beam
+_build
+_checkouts
+.rebar3
+log/
+compile_commands.json
+*.crashdump
+rebar.lock
+*.dump
+*.log
+
+# AWS packaged template
+packaged.yaml

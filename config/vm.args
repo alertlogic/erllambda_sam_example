@@ -1,0 +1,7 @@
+-setcookie erllambda_sam_example_cookie
+
+-connect_all false
+-start_epmd false
+-smp
++K true
++W w
