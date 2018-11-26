@@ -90,7 +90,7 @@ $ curl https://ea5728392s9.execute-api.us-east-1.amazonaws.com/Prod/resource/bar
 #### Get all items
 
 ``` shell
-$ curl https://ea5728392s9.execute-api.us-east-1.amazonaws.com/Prod/resource/bar
+$ curl https://ea5728392s9.execute-api.us-east-1.amazonaws.com/Prod/resource
 [{"id":"foo","field":"foo"},{"id":"bar","field":"bar"}]
 ```
 
