@@ -18,7 +18,7 @@ Create a package as it's shown in [create package](https://github.com/alertlogic
 If environment is configured correctly it should be as easy as:
 
 ``` shell
-git clone git@github.com:alertlogic/erllambda_sam_example.git
+git clone https://github.com/alertlogic/erllambda_sam_example.git
 cd erllambda_sam_example
 rebar3 get-deps
 rebar3 compile
