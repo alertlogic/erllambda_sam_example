@@ -26,6 +26,90 @@ rebar3 release
 rebar3 erllambda zip
 ```
 
+**Note**: you might want to run `compile`, `release` and `erllambda zip` commands from [erllambda docker](https://github.com/alertlogic/erllambda_docker) container as it's described in [rebar3_erllambda readme](https://github.com/alertlogic/rebar3_erllambda#using-the-erllambda-docker-container) since some artifacts are sensitive to a target platform. 
+
+### Run lambda locally
+
+Before function is deployed in to AWS there's an option to start function locally and verify that it works as expected without creating all necessary resources in AWS.
+This possibility provided by AWS `sam` tool.
+
+#### Local package
+
+The only difference in a local package and a package that is created for production deployment is a
+config file, that is shipped with erlang release. For local stack package will be packaged with
+[local-sys.config](config/local-sys.config), which has a section for `erlcloud` library that allows
+to modify AWS config variables to route calls to AWS services to a specified host.
+
+In this example dynamodb will be started on a local machine in a docker container. In order to be
+able to talk to dynamodb from lambda container, `erlcloud` library should be configured to point to
+a docker host address, which can route all requests to a process listening on a provided port.
+
+``` erlang
+{erlcloud,
+  [{aws_config,
+    [{ddb_scheme, "http://"},
+     {ddb_host, "host.docker.internal"},
+     {ddb_port, 8000}]}
+  ]}
+```
+
+#### Build a package for local stack
+
+Build local package as you would do it for AWS stack but specify `local` profile for `rebar3` commands:
+
+``` shell
+rebar3 as local compile
+rebar3 as local release
+rebar3 as local erllambda release
+```
+
+#### Start dependencies
+
+This example requires running dynamodb to function properly.
+For the local stack we are going to use [official dynamodb](https://hub.docker.com/r/amazon/dynamodb-local/) docker image.
+
+``` shell
+docker pull amazon/dynamodb-local
+```
+
+To be able to talk to dynamodb instance from multiple hosts, container should be started with a shared DB:
+
+``` shell
+docker run --rm -v `pwd`/_data:/var/dynamodb_data -d -p 8000:8000 --name dynamodb \
+    amazon/dynamodb-local -jar DynamoDBLocal.jar -sharedDb -dbPath /var/dynamodb_data
+```
+
+Create dynamodb table for the lambda function. Table will be created automatically by AWS cloudformation template, but for local stack this is a manual process:
+
+``` shell
+aws dynamodb create-table                                    \
+    --endpoint http://localhost:8000                         \
+    --table-name test-table                                  \
+    --attribute-definitions AttributeName=id,AttributeType=S \
+    --key-schema AttributeName=id,KeyType=HASH               \
+    --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=10
+```
+
+#### Start function locally
+
+Using `sam local` start local AWS Lambda runtime with a configured in the template API Gateway:
+
+``` shell
+TABLE_NAME=test-table sam local start-api \
+    -t ./etc/local-template.yaml --region us-east-1
+```
+
+#### Call local API Gateway
+
+Once `sam local` has been initialised and started your function will be accessible on port `3000`:
+
+``` shell
+$ curl http://localhost:3000/resource -XPOST -d '{"id": "bar", "field": "bar-field"}'
+[]
+$ curl http://localhost:3000/resource
+[{"field":"bar-field","id":"bar"}]
+```
+
 ### Deploy
 
 1. We need a `S3 bucket` where we can upload our Lambda

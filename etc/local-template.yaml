@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >-
+  A simple backend (read/write to DynamoDB) with a RESTful API endpoint using Amazon API Gateway.
+
+Globals:
+  #https://github.com/awslabs/serverless-application-model/blob/develop/docs/globals.rst
+  Function:
+    Runtime: provided
+    MemorySize: 512
+    Environment:
+      Variables:
+        TABLE_NAME:
+          Ref: Table
+
+Resources:
+  erllambdaSAMExample:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: erllambda_sam_example
+      CodeUri: ../_build/local/rel/erllambda_sam_example
+      Description: >-
+        A simple backend (read/write to DynamoDB) with a RESTful API endpoint using Amazon API Gateway.
+      Timeout: 10
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref Table
+      Events:
+        Create:
+          Type: Api
+          Properties:
+            Path: /resource
+            Method: post
+        Read:
+          Type: Api
+          Properties:
+            Path: /resource/{id}
+            Method: get
+        List:
+          Type: Api
+          Properties:
+            Path: /resource
+            Method: get
+        Update:
+          Type: Api
+          Properties:
+            Path: /resource/{id}
+            Method: put
+        Delete:
+          Type: Api
+          Properties:
+            Path: /resource/{id}
+            Method: delete
+
+  Table:
+    Type: AWS::Serverless::SimpleTable
+
+
+
+Outputs:
+  ApiURL:
+    Description: "API endpoint URL for Prod environment"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/resource"
