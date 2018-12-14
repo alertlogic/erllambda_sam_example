@@ -18,7 +18,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: erllambda_sam_example
-      CodeUri: ../_build/default/erllambda_sam_example-1.2.0.zip
+      CodeUri: ../_build/local/rel/erllambda_sam_example
       Description: >-
         A simple backend (read/write to DynamoDB) with a RESTful API endpoint using Amazon API Gateway.
       Timeout: 10
